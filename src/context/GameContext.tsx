@@ -41,7 +41,8 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   const [joinedPlayers, setJoinedPlayers] = useState<Player[]>([]);
   const [gameState, setGamestate] = useState<GameState>({
     // gameProcess: "CaIE_mThqdFYB3hy9wNA5FDYIFOAwzLsQsxo1CWWrSU",
-    gameProcess: "DVfmQJsqhoRxPdr5U9fUVCSz4n0qyhyw_Dtlj2_QEuc",
+    // gameProcess: "DVfmQJsqhoRxPdr5U9fUVCSz4n0qyhyw_Dtlj2_QEuc",
+    gameProcess: "YRYGdwhbbXaj7U0xMmJ81ROM4RQmGivPY4aNzTfyJdk",
     activeDrawer: "",
     currentRound: 0,
     maxRounds: 0,

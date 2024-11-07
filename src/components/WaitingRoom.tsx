@@ -25,6 +25,7 @@ export default function WaitingRoom() {
     joinedPlayers,
     setJoinedPlayers,
     setMode,
+    mode,
     gameState,
     setGamestate,
   } = useGameContext();
@@ -157,7 +158,11 @@ export default function WaitingRoom() {
               size="lg"
               className="px-8"
               onClick={handleStartGame}
-              disabled={joinedPlayers.length < 2}
+              disabled={
+                joinedPlayers.length < 2 ||
+                mode === "drawing" ||
+                mode === "guessing"
+              }
             >
               Start Game
             </Button>

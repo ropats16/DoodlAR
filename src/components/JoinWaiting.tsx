@@ -28,6 +28,8 @@ export default function JoinWaiting() {
         ]
       );
 
+      console.log("Register player result", Messages);
+
       if (Messages[0].Data === "Successfully registered to game.") {
         toast({
           title: "Successfully registered.",

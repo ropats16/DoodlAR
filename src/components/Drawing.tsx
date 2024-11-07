@@ -35,6 +35,13 @@ const Drawing: FC<DrawingProps> = ({ timeLeft }) => {
       chosenWord === ""
     ) {
       fetchChosenWord();
+      toast({
+        title: "Next round started.",
+        description:
+          currentPlayer && currentPlayer.id === gameState.activeDrawer
+            ? "You are the drawer this round."
+            : "Waiting for the drawer to finish.",
+      });
     }
   }, [timeLeft]);
 

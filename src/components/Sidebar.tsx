@@ -5,16 +5,19 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { dryrunResult, messageResult } from "@/lib/utils";
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function Sidebar() {
   const { gameState, joinedPlayers } = useGameContext();
 
   const [chatMessages, setChatMessages] = useState<
     {
-      playerId: string;
-      playerName: string;
+      id: string;
+      name: string;
       message: string;
-      timeStamp: number;
+      timestamp: number;
     }[]
   >([]);
   const [message, setMessage] = useState("");
@@ -32,6 +35,7 @@ export default function Sidebar() {
   };
 
   const sendChatMessage = async () => {
+    console.log("Sending message", message);
     const { Messages, Spawns, Output, Error } = await messageResult(
       gameState.gameProcess,
       [
@@ -42,6 +46,8 @@ export default function Sidebar() {
       ],
       message
     );
+
+    console.log("Broadcast result", Messages);
 
     setMessage("");
     fetchChatMessages();
@@ -70,37 +76,51 @@ export default function Sidebar() {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="chat" className="mt-4">
-          <div className="h-[calc(100vh-16rem)] overflow-y-auto mb-4">
+          <ScrollArea className="h-[calc(100vh-15rem)] pr-4">
             {chatMessages.map((msg, index) => (
-              <div key={index} className="mb-2 flex flex-col gap-2">
-                <div className="flex justify-between">
-                  <div>
-                    <span className="font-semibold text-muted">
-                      {msg.playerName}:
-                    </span>
-                    <span className="text-xs text-gray-500 ml-2">
-                      (
-                      {msg.playerId
-                        ? `${msg.playerId.slice(0, 4)}...${msg.playerId.slice(-3)}`
-                        : "0xANON"}
-                      )
-                    </span>
+              <Card key={index} className="mb-4">
+                <CardContent className="p-4">
+                  <div className="flex items-start space-x-4">
+                    <Avatar>
+                      <AvatarImage
+                        src={`https://api.dicebear.com/6.x/initials/svg?seed=${msg.name}`}
+                      />
+                      <AvatarFallback>
+                        {msg.name.slice(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="font-semibold text-foreground">
+                            {msg.name}
+                          </span>
+                          <span className="text-xs text-muted-foreground ml-2">
+                            (
+                            {msg.id
+                              ? `${msg.id.slice(0, 4)}...${msg.id.slice(-3)}`
+                              : "0xANON"}
+                            )
+                          </span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(msg.timestamp).toLocaleTimeString()}
+                        </span>
+                      </div>
+                      <p className="text-sm text-foreground">{msg.message}</p>
+                    </div>
                   </div>
-                  <span className="text-xs text-gray-500">
-                    {new Date(msg.timeStamp).toLocaleTimeString()}
-                  </span>
-                </div>
-                <span>{msg.message}</span>
-              </div>
+                </CardContent>
+              </Card>
             ))}
-          </div>
+          </ScrollArea>
           <div className="flex gap-2">
             <Input
               placeholder="Type a message"
               className="flex-grow"
               onChange={(e) => setMessage(e.target.value)}
             />
-            <Button onClick={() => sendChatMessage()}>Send</Button>
+            <Button onClick={sendChatMessage}>Send</Button>
           </div>
         </TabsContent>
         <TabsContent value="leaderboard" className="mt-4">

@@ -93,6 +93,13 @@ const Guessing: FC<GuessingProps> = ({ timeLeft }) => {
   useEffect(() => {
     if (drawing === null) {
       fetchDrawing();
+      toast({
+        title: "Time to guess!",
+        description:
+          currentPlayer && currentPlayer.id === gameState.activeDrawer
+            ? "You are the drawer this round."
+            : "Guess what the drawer has drawn.",
+      });
     }
 
     if (timeLeft === 0 && mode === "guessing") {

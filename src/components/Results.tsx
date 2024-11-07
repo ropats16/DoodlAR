@@ -35,27 +35,30 @@ export default function Results() {
         </p>
         <div className="bg-muted rounded-lg p-6 mb-12">
           <ul className="space-y-4">
-            {joinedPlayers.map((player, index) => (
-              <li
-                key={player.id}
-                className={`flex items-center justify-between p-4 rounded-lg border ${
-                  index < 3
-                    ? topColors[index]
-                    : "bg-background border-transparent"
-                }`}
-              >
-                <div className="flex items-center">
-                  <span className="text-2xl font-bold mr-4 w-8">
-                    {index + 1}.
+            {joinedPlayers
+              .slice()
+              .sort((a, b) => b.score! - a.score!)
+              .map((player, index) => (
+                <li
+                  key={player.id}
+                  className={`flex items-center justify-between p-4 rounded-lg border ${
+                    index < 3
+                      ? topColors[index]
+                      : "bg-background border-transparent"
+                  }`}
+                >
+                  <div className="flex items-center">
+                    <span className="text-2xl font-bold mr-4 w-8">
+                      {index + 1}.
+                    </span>
+                    {getMedalIcon(index)}
+                    <span className="text-xl ml-2">{player.name}</span>
+                  </div>
+                  <span className="text-xl font-semibold">
+                    {player.score} pts
                   </span>
-                  {getMedalIcon(index)}
-                  <span className="text-xl ml-2">{player.name}</span>
-                </div>
-                <span className="text-xl font-semibold">
-                  {player.score} pts
-                </span>
-              </li>
-            ))}
+                </li>
+              ))}
           </ul>
         </div>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">

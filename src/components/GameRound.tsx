@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 
 import Sidebar from "./Sidebar";
 import Drawing from "./Drawing";
@@ -9,6 +9,7 @@ import { dryrunResult } from "@/lib/utils";
 import Guessing from "./Guessing";
 import { toast } from "@/hooks/use-toast";
 import Results from "./Results";
+import { useActiveAddress } from "arweave-wallet-kit";
 
 export default function GameRound() {
   const {
@@ -16,11 +17,14 @@ export default function GameRound() {
     gameState,
     joinedPlayers,
     setJoinedPlayers,
+    currentPlayer,
     setGamestate,
     setMode,
   } = useGameContext();
 
   const [timeLeft, setTimeLeft] = useState(60);
+
+  const activeAddress = useActiveAddress();
 
   const fetchGameState = async () => {
     console.log("Fetching game state");
@@ -31,29 +35,18 @@ export default function GameRound() {
       },
     ]);
 
-    console.log("Game state result", GameState.mode);
+    console.log("Game state result", GameState.mode, mode);
 
-    if (GameState.mode == "Drawing" && mode != "drawing") {
-      toast({
-        title: "Next round started.",
-        description: "You are being redirected to the drawing page.",
-      });
+    if (GameState.mode === "Drawing" && mode !== "drawing") {
       setGamestate({
         ...gameState,
         currentRound: GameState.currentRound,
         activeDrawer: GameState.activeDrawer,
       });
       setMode("drawing");
-    } else if (GameState.mode == "Guessing" && mode != "guessing") {
-      toast({
-        title: "Time to guess!",
-        description: "You are being redirected to the guessing page.",
-      });
-      setGamestate({
-        ...gameState,
-      });
+    } else if (GameState.mode === "Guessing" && mode !== "guessing") {
       setMode("guessing");
-    } else if (GameState.mode == "Completed" && mode != "results") {
+    } else if (GameState.mode === "Completed" && mode !== "results") {
       toast({
         title: "Final results are in!",
         description: "You are being redirected to the results page.",
@@ -82,34 +75,40 @@ export default function GameRound() {
     const timerInterval = setInterval(() => {
       if (timeLeft > 0 && mode !== "results") {
         setTimeLeft(timeLeft - 1);
-      } else if (timeLeft === 0) {
+      } else if (timeLeft === 0 || timeLeft % 5 === 0) {
         console.log("Fetching game state from round for timer");
         fetchGameState();
       }
     }, 1000);
 
-    return () => clearInterval(timerInterval);
-  }, [timeLeft]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      console.log("Fetching game state from round for new mode");
-      fetchGameState();
-    }, 5000);
-
     if (mode === "results") {
-      clearInterval(interval);
+      clearInterval(timerInterval);
     }
-  }, []);
+
+    return () => clearInterval(timerInterval);
+  }, [timeLeft, mode, activeAddress]);
+
+  //   useEffect(() => {
+  //     const interval = setInterval(() => {
+  //       console.log("Fetching game state from round for new mode");
+  //       fetchGameState();
+  //     }, 5000);
+
+  //     if (mode === "results") {
+  //       clearInterval(interval);
+  //     }
+
+  //     // return () => clearInterval(interval);
+  //   }, [mode]);
 
   useEffect(() => {
     if (mode !== "results") {
       console.log("Fetching game state from round for mode change");
       userRes();
-      //   fetchGameState();
+      fetchGameState();
       setTimeLeft(60);
     }
-  }, [mode]);
+  }, [mode, activeAddress]);
 
   return (
     <main className="flex bg-background min-h-screen text-foreground">
